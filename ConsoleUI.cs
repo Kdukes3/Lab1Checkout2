@@ -7,7 +7,6 @@ public static class ConsoleUI
     private static INotifier _notifier;
     private static IClock _clock;
     private static InMemoryRepository _repo;
-    private const string SEP = "=========================================";
 
     public static void Run()
     {
