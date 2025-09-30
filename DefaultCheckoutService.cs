@@ -4,7 +4,7 @@ public class DefaultCheckoutService : ICheckoutService
 {
     private IRepository _repo;
     private ICatalog _catalog;
-    private IPolicy _policy;
+    private DefaultPolicy _policy;
     private IClock _clock;
     public DefaultCheckoutService(InMemoryRepository repo, DefaultPolicy policy, IClock clock)
     {

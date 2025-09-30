@@ -40,8 +40,8 @@ public static class ConsoleUI
                     case "5": DoReturn(); break;
                     case "6": ShowDueSoon(); break;
                     case "7": ShowOverdue(); break;
-                    case "8": Search(); break;
-                    case "9": MarkLost(); break;
+                    
+                    case "8": MarkLost(); break;
                     default: Console.WriteLine("Invalid input. Try again."); break;
                 }
             }
@@ -85,7 +85,13 @@ public static class ConsoleUI
             var name = user_Prompt("Name: ");
             var category = user_Prompt("Category: ");
             var condition = user_Prompt("Condition: ");
-            _repo.SaveItem(new Item(id, name, category, condition, ItemStatus.AVAILABLE));
+            _repo.SaveItem(new Item(id.ToString(), name.ToString(), category.ToString(), condition.ToString(), ItemStatus.AVAILABLE));
+
+            var contin = user_Prompt("Continue? [Y/n]: ");
+            if (contin == "n")
+            {
+                break;
+            }
         }
     }
 
@@ -123,20 +129,19 @@ public static class ConsoleUI
             else if (i.Status == ItemStatus.CHECKED_OUT) outed.Add(i);
         }
 
-
         if (lost.Count > 0)
         {
             Console.WriteLine("LOST:");
             foreach (var i in lost) Console.WriteLine(i.ToString());
         }
+
         if (outed.Count > 0)
         {
             Console.WriteLine("CHECKED_OUT:");
             foreach (var i in outed) Console.WriteLine(i.ToString());
         }
     }
-        
-    }
+
 
     private static void DoCheckout()
     {
@@ -150,7 +155,55 @@ public static class ConsoleUI
         Console.WriteLine(DateTime.Now + "Checkout" + dueDate);
     }
 
-    private static object user_Prompt(string id)
+    private static void DoReturn()
+    {
+        Console.WriteLine("Return item");
+        var id = user_Prompt("Item ID: ");
+        var r = _service.ReturnItem(id.ToString());
+        Console.WriteLine("-> Your receipt:");
+        Console.WriteLine(r.ToString());
+    }
+
+    private static void ShowDueSoon()
+    {
+        Console.WriteLine("Due soon (next 24h)");
+        var soon = _service.FindDueSoon(TimeSpan.FromHours(24));
+        if (soon == null)
+        {
+            Console.WriteLine("Due soon not found");
+            return;
+        }
+
+        foreach (var r in soon)
+        {
+            _notifier.DueSoon(r.Borrower, r);
+        }
+    }
+
+    private static void ShowOverdue()
+    {
+        Console.WriteLine("Overdue");
+        var overdue = _service.FindOverdue();
+        if (overdue == null)
+        {
+            Console.WriteLine("Overdue not found");
+        }
+
+        foreach (var r in overdue)
+        {
+            _notifier.Overdue(r.Borrower, r);
+        }
+    }
+
+    private static void MarkLost()
+    {
+        Console.WriteLine("Mark lost LOST");
+        var id = user_Prompt("Item ID: ");
+        _service.MarkLost(id.ToString());
+        Console.WriteLine("Item marked lost");
+    }
+    
+private static object user_Prompt(string id)
     {
         throw new NotImplementedException();
     }
