@@ -19,11 +19,27 @@ public class DefaultCheckoutService : ICheckoutService
         return _catalog;
     }
 
-    public Receipt Checkout(string message, string itemId, Borrower borrower, DateTime dueDate)
+    public void Checkout(string message, string itemId, Borrower borrower, DateTime dueDate)
     {
+
+        var r1 = _repo.GetItem(itemId);
+        if (r1 == null)
+        {
+            throw new InvalidOperationException("Item '" + itemId + "' not found.");
+        }
+
+        if (!_policy.CanCheckout(r1))
+        {
+            throw new InvalidOperationException("Item '" + itemId + "' is not available for checkout.");
+        }
         
-        Receipt r1 = new Receipt(message, itemId, borrower, dueDate);
-        return r1;
+        var normalized = _policy.NormalizeDueDate(dueDate);
+        r1.Status = ItemStatus.CHECKED_OUT;
+        _repo.SaveItem(r1);
+        
+        var record = new CheckoutRecord(r1.Id, borrower, _clock.Today(), normalized);
+        _repo.SaveRecord(record);
+        
     }
 
     public Receipt ReturnItem(string itemId)

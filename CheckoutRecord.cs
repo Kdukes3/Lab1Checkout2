@@ -8,12 +8,12 @@ public class CheckoutRecord
     public DateTime DueDate { get; set; }
     public DateTime ReturnDate { get; set; }
     
-    public CheckoutRecord(string itemId, Borrower borrower, DateTime checkoutDate, DateTime dueDate, DateTime returnDate)
+    public CheckoutRecord(string itemId, Borrower borrower, DateTime checkoutDate, DateTime dueDate)
     {
         ItemId = itemId;
         Borrower = borrower;
         CheckoutDate = checkoutDate;
         DueDate = dueDate;
-        ReturnDate = returnDate;
+        ReturnDate = dueDate;
     }
 }
