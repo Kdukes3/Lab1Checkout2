@@ -3,7 +3,7 @@ namespace Lab1Checkout2;
 public class DefaultCheckoutService : ICheckoutService
 {
     private IRepository _repo;
-    private ICatalog _catalog;
+    private Catalog _catalog;
     private DefaultPolicy _policy;
     private IClock _clock;
     public DefaultCheckoutService(InMemoryRepository repo, DefaultPolicy policy, IClock clock)
@@ -19,14 +19,18 @@ public class DefaultCheckoutService : ICheckoutService
         return _catalog;
     }
 
-    public Receipt Checkout(string itemId, Borrower borrower, DateTime dueDate)
+    public Receipt Checkout(string message, string itemId, Borrower borrower, DateTime dueDate)
     {
-        throw new NotImplementedException();
+        
+        Receipt r1 = new Receipt(message, itemId, borrower, dueDate);
+        return r1;
     }
 
     public Receipt ReturnItem(string itemId)
     {
-        throw new NotImplementedException();
+        _repo.GetItem(itemId).Status = ItemStatus.AVAILABLE;
+        //Possibly implement a removal of dueDate
+        
     }
 
     public void MarkLost(string itemId)
