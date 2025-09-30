@@ -2,23 +2,35 @@ namespace Lab1Checkout2;
 
 public class Catalog : ICatalog
 {
+    private IRepository _repo;
+
+    public Catalog(IRepository repo)
+    {
+        _repo = repo;
+    }
     public List<Item> ListAvailable()
     {
-        throw new NotImplementedException();
+        var result = new List<Item>();
+        foreach (var i in _repo.AllItems())
+        {
+            if (i.Status == ItemStatus.AVAILABLE) result.Add(i);
+        }
+        return result;
     }
 
     public List<Item> ListUnavailable()
     {
-        throw new NotImplementedException();
+        var result = new List<Item>();
+        foreach (var i in _repo.AllItems())
+        {
+            if (i.Status != ItemStatus.AVAILABLE) result.Add(i);
+        }
+        return result;
     }
 
     public Item FindById(string itemId)
     {
-        throw new NotImplementedException();
+        return _repo.GetItem(itemId);
     }
-
-    public List<Item> SearchBy(int criteria, string query)
-    {
-        throw new NotImplementedException();
-    }
+    
 }

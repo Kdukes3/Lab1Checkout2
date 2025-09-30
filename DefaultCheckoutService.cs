@@ -2,14 +2,21 @@ namespace Lab1Checkout2;
 
 public class DefaultCheckoutService : ICheckoutService
 {
+    private IRepository _repo;
+    private ICatalog _catalog;
+    private IPolicy _policy;
+    private IClock _clock;
     public DefaultCheckoutService(InMemoryRepository repo, DefaultPolicy policy, IClock clock)
     {
-        throw new NotImplementedException();
+        _repo = repo;
+        _catalog = new Catalog(repo);
+        _policy = policy;
+        _clock = clock;
     }
     
     public Catalog GetCatalog()
     {
-        throw new NotImplementedException();
+        return _catalog;
     }
 
     public Receipt Checkout(string itemId, Borrower borrower, DateTime dueDate)

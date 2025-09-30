@@ -89,6 +89,67 @@ public static class ConsoleUI
         }
     }
 
+    private static void ListAvailable()
+    {
+        Console.WriteLine("List of available items");
+        var items = _catalog.ListAvailable();
+        if (items.Count == 0)
+        {
+            Console.WriteLine("No items found");
+            return;
+        }
+
+        foreach (var i in items)
+        {
+            Console.WriteLine(i.ToString());
+        }
+    }
+
+    private static void ListUnavailable()
+    {
+        Console.WriteLine("List of unavailable items");
+        var items = _catalog.ListUnavailable();
+        if (items.Count == 0)
+        {
+            Console.WriteLine("No items found");
+            return;
+        }
+
+        var lost = new List<Item>();
+        var outed = new List<Item>();
+        foreach (var i in items)
+        {
+            if (i.Status == ItemStatus.LOST) lost.Add(i);
+            else if (i.Status == ItemStatus.CHECKED_OUT) outed.Add(i);
+        }
+
+
+        if (lost.Count > 0)
+        {
+            Console.WriteLine("LOST:");
+            foreach (var i in lost) Console.WriteLine(i.ToString());
+        }
+        if (outed.Count > 0)
+        {
+            Console.WriteLine("CHECKED_OUT:");
+            foreach (var i in outed) Console.WriteLine(i.ToString());
+        }
+    }
+        
+    }
+
+    private static void DoCheckout()
+    {
+        Console.WriteLine("Check out item");
+        var id = user_Prompt("Item ID: ");
+        var name = user_Prompt("Your name: ");
+        var email = user_Prompt("Your email: ");
+        var dueText = user_Prompt("Due date: ");
+        DateTime dueDate = default;
+        Console.WriteLine("-> Your receipt:");
+        Console.WriteLine(DateTime.Now + "Checkout" + dueDate);
+    }
+
     private static object user_Prompt(string id)
     {
         throw new NotImplementedException();
