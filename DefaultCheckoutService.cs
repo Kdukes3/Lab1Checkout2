@@ -22,34 +22,62 @@ public class DefaultCheckoutService : ICheckoutService
     public Receipt Checkout(string message, string itemId, Borrower borrower, DateTime dueDate)
     {
         
-        Receipt r1 = new Receipt(message, itemId, borrower, dueDate);
+        Receipt r1 = new Receipt(message, itemId, dueDate);
         return r1;
     }
-
+    
     public Receipt ReturnItem(string itemId)
     {
-        _repo.GetItem(itemId).Status = ItemStatus.AVAILABLE;
-        //Possibly implement a removal of dueDate
-        
+        var item = _repo.GetItem(itemId);
+        var rec = _repo.GetActiveRecordFor(itemId);
+        rec.ReturnDate = _clock.Today();
+        _repo.SaveRecord(rec);
+        item.Status = ItemStatus.AVAILABLE;
+        _repo.SaveItem(item);
+        return new Receipt("Return", item.Id, _clock.Today());
     }
 
     public void MarkLost(string itemId)
     {
-        throw new NotImplementedException();
+        var item = _repo.GetItem(itemId);
+        item.Status = ItemStatus.LOST;
+        _repo.SaveItem(item);
     }
 
     public List<CheckoutRecord> ListActiveLoans()
     {
-        throw new NotImplementedException();
+        List<CheckoutRecord> active = new List<CheckoutRecord>();
+        
+        foreach (var a in _repo.AllRecords())
+        {
+            if (a.ReturnDate < DateTime.Today)
+            {
+                active.Add(a);
+            }
+        }
+        return active;
     }
 
     public List<CheckoutRecord> FindDueSoon(TimeSpan window)
     {
-        throw new NotImplementedException();
+        var now = _clock.Today();
+        var upper = now.Add(window);
+        var list = new List<CheckoutRecord>();
+        foreach (var r in ListActiveLoans())
+        {
+            if (r.DueDate >= now && r.DueDate <= upper) list.Add(r);
+        }
+        return list;
     }
-
     public List<CheckoutRecord> FindOverdue()
     {
-        throw new NotImplementedException();
+        var now = _clock.Today();
+        var list = new List<CheckoutRecord>();
+        foreach (var r in ListActiveLoans())
+        {
+            if (r.DueDate < now) list.Add(r);
+        }
+        return list;
     }
+
 }
