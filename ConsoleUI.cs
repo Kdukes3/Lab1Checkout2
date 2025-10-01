@@ -176,7 +176,7 @@ public static class ConsoleUI
     {
         Console.WriteLine("Due soon (next 24h)");
         var soon = _service.FindDueSoon(TimeSpan.FromHours(24));
-        if (soon == null)
+        if (soon.Count == 0)
         {
             Console.WriteLine("Due soon not found");
             return;
@@ -192,7 +192,7 @@ public static class ConsoleUI
     {
         Console.WriteLine("Overdue");
         var overdue = _service.FindOverdue();
-        if (overdue == null)
+        if (overdue.Count == 0)
         {
             Console.WriteLine("Overdue not found");
             return;
@@ -208,7 +208,7 @@ public static class ConsoleUI
     {
         Console.WriteLine("Mark lost LOST");
         var id = user_Prompt("Item ID: ");
-        _service.MarkLost(id.ToString());
+        _service.MarkLost(id);
         Console.WriteLine("Item marked lost");
     }
 
