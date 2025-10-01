@@ -158,7 +158,8 @@ public static class ConsoleUI
         var name = user_Prompt("Your name: ");
         var email = user_Prompt("Your email: ");
         var dueText = user_Prompt("Due date: ");
-        DateTime dueDate = default;
+        _repo.GetItem(id).Status = ItemStatus.CHECKED_OUT;
+        DateTime dueDate = DateTime.Parse(dueText);
         Console.WriteLine("-> Your receipt:");
         Console.WriteLine(DateTime.Now + "| " +" Checkout " +  "| " + dueDate);
     }
@@ -211,9 +212,4 @@ public static class ConsoleUI
         _service.MarkLost(id.ToString());
         Console.WriteLine("Item marked lost");
     }
-
-// private static object user_Prompt(string id)
-//     {
-//         throw new NotImplementedException();
-//     }
 }
