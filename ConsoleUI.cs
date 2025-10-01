@@ -212,9 +212,4 @@ public static class ConsoleUI
         _service.MarkLost(id);
         Console.WriteLine("Item marked lost");
     }
-
-// private static object user_Prompt(string id)
-//     {
-//         throw new NotImplementedException();
-//     }
 }
