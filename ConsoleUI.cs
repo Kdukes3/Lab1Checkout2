@@ -8,7 +8,8 @@ public static class ConsoleUI
     private static IClock _clock;
     private static InMemoryRepository _repo;
 
-    public static void Run()
+    //program starts running
+    public static void Run() 
     {
         _clock = new SystemClock();
         _repo = new InMemoryRepository();
@@ -17,12 +18,12 @@ public static class ConsoleUI
         _catalog = _service.GetCatalog();
         _notifier = new LogNotifier();
 
-        while (true)
+        while (true) //Main loop for user
         {
             ShowMenu();
             Console.Write("Select a number: ");
             string user_input = Console.ReadLine();
-            if (string.IsNullOrEmpty(user_input)) continue;
+            if (string.IsNullOrWhiteSpace(user_input)) continue;
             if (user_input == "0")
             {
                 break;
@@ -30,6 +31,7 @@ public static class ConsoleUI
 
             try
             {
+                //Deciding option for menu
                 switch (user_input)
                 {
                     case "1": AddItems(); break;
@@ -39,19 +41,18 @@ public static class ConsoleUI
                     case "5": DoReturn(); break;
                     case "6": ShowDueSoon(); break;
                     case "7": ShowOverdue(); break;
-                    
                     case "8": MarkLost(); break;
                     default: Console.WriteLine("Invalid input. Try again."); break;
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex) //For catching error within switch
             {
-                Console.WriteLine("Error" + ex.Message);
+                Console.WriteLine("Error " + ex.Message);
             }
         }
     }
 
-    public static void ShowMenu()
+    public static void ShowMenu() //Print main menu
     {
         Console.WriteLine("1) Add items to inventory");
         Console.WriteLine("2) List available items");
@@ -60,13 +61,13 @@ public static class ConsoleUI
         Console.WriteLine("5) Return item");
         Console.WriteLine("6) Due soon (next 24h)");
         Console.WriteLine("7) Overdue");
-        Console.WriteLine("8) Search");
-        Console.WriteLine("9) Mark item LOST");
+        Console.WriteLine("8) Mark item LOST");
         Console.WriteLine("0) Exit");
     }
 
-    private static string user_Prompt()
+    private static string user_Prompt(string label) //Check for non-empty inputs
     {
+        Console.Write(label);
         while (true)
         {
             var input = Console.ReadLine();
@@ -74,7 +75,7 @@ public static class ConsoleUI
         }
     }
 
-    private static void AddItems()
+    private static void AddItems() //Menu option 1
     {
         Console.WriteLine("Add items to inventory");
         while (true)
@@ -84,17 +85,25 @@ public static class ConsoleUI
             var name = user_Prompt("Name: ");
             var category = user_Prompt("Category: ");
             var condition = user_Prompt("Condition: ");
-            _repo.SaveItem(new Item(id.ToString(), name.ToString(), category.ToString(), condition.ToString(), ItemStatus.AVAILABLE));
+            
 
             var contin = user_Prompt("Continue? [Y/n]: ");
+            if (contin == "y")
+            {
+                _repo.SaveItem(new Item(id, name, category, condition,
+                                ItemStatus.AVAILABLE));
+                continue;
+            }
             if (contin == "n")
             {
+                _repo.SaveItem(new Item(id, name, category, condition,
+                    ItemStatus.AVAILABLE));
                 break;
             }
         }
     }
 
-    private static void ListAvailable()
+    private static void ListAvailable() //Menu option 2
     {
         Console.WriteLine("List of available items");
         var items = _catalog.ListAvailable();
@@ -106,11 +115,11 @@ public static class ConsoleUI
 
         foreach (var i in items)
         {
-            Console.WriteLine(i.ToString());
+            Console.WriteLine(i.Name);
         }
     }
 
-    private static void ListUnavailable()
+    private static void ListUnavailable() //Menu option 3
     {
         Console.WriteLine("List of unavailable items");
         var items = _catalog.ListUnavailable();
@@ -131,18 +140,18 @@ public static class ConsoleUI
         if (lost.Count > 0)
         {
             Console.WriteLine("LOST:");
-            foreach (var i in lost) Console.WriteLine(i.ToString());
+            foreach (var i in lost) Console.WriteLine(i.Name);
         }
 
         if (outed.Count > 0)
         {
             Console.WriteLine("CHECKED_OUT:");
-            foreach (var i in outed) Console.WriteLine(i.ToString());
+            foreach (var i in outed) Console.WriteLine(i.Name);
         }
     }
 
 
-    private static void DoCheckout()
+    private static void DoCheckout() //Menu option 4
     {
         Console.WriteLine("Check out item");
         var id = user_Prompt("Item ID: ");
@@ -151,19 +160,19 @@ public static class ConsoleUI
         var dueText = user_Prompt("Due date: ");
         DateTime dueDate = default;
         Console.WriteLine("-> Your receipt:");
-        Console.WriteLine(DateTime.Now + "Checkout" + dueDate);
+        Console.WriteLine(DateTime.Now + "| " +" Checkout " +  "| " + dueDate);
     }
 
-    private static void DoReturn()
+    private static void DoReturn() //Menu option 5
     {
         Console.WriteLine("Return item");
         var id = user_Prompt("Item ID: ");
-        var r = _service.ReturnItem(id.ToString());
+        var r = _service.ReturnItem(id);
         Console.WriteLine("-> Your receipt:");
         Console.WriteLine(r.ToString());
     }
 
-    private static void ShowDueSoon()
+    private static void ShowDueSoon() //Menu option 6
     {
         Console.WriteLine("Due soon (next 24h)");
         var soon = _service.FindDueSoon(TimeSpan.FromHours(24));
@@ -179,13 +188,14 @@ public static class ConsoleUI
         }
     }
 
-    private static void ShowOverdue()
+    private static void ShowOverdue() //Menu option 7
     {
         Console.WriteLine("Overdue");
         var overdue = _service.FindOverdue();
         if (overdue == null)
         {
             Console.WriteLine("Overdue not found");
+            return;
         }
 
         foreach (var r in overdue)
@@ -194,16 +204,16 @@ public static class ConsoleUI
         }
     }
 
-    private static void MarkLost()
+    private static void MarkLost()//Menu option 8
     {
         Console.WriteLine("Mark lost LOST");
         var id = user_Prompt("Item ID: ");
         _service.MarkLost(id.ToString());
         Console.WriteLine("Item marked lost");
     }
-    
-private static object user_Prompt(string id)
-    {
-        throw new NotImplementedException();
-    }
+
+// private static object user_Prompt(string id)
+//     {
+//         throw new NotImplementedException();
+//     }
 }
